@@ -155,6 +155,16 @@ AIX and Solaris, you will have to edit `makefile` first, see the notes below.
 command `xcode-select --install`) are sufficient to compile `tnylpo`,
 and the `ncurses` library is available by default.
 
+There seems to be a `ncurses` incompatibility between Mac OS X 15 (Sequoia)
+and preceeding OS versions: In certain circumstances, `tnylpo` executables
+compiled on an earlier OS version display all printable characters as `^@`
+on the full screen console under Mac OS X 15 (the line orientated console
+is not affected). Finally, I was able to reproduce this reported issue after
+updating my M1 MacBook Pro from Mac OS X 13 (Ventura) to Mac OS X 15, but the
+exact mechanics of this bug still elude me. Fortunately, the problem is easily
+fixed by recompiling `tnylpo` (`make veryclean ; make`) under Mac OS X 15
+(after an OS update, be sure to update the Xcode Command Line Tools as well).
+ 
 *Linux*: On most distributions, the packages `build-essential` and
 `libncurses-dev` (and optionally, `git`) resp. their dependencies provide
 everything needed for building `tynlpo`.
