@@ -1,7 +1,7 @@
 # `tnylpo`
 ## What is this?
 `tnylpo` allows the execution of programs written for CP/M-80
-version 2.2 under Unixy operating systems. It has been tested
+version 2.2 under Unixy operating systems and Windows. It has been tested
 under
 * Linux
   * Debian 8 i386, powerpc; Debian 9 amd64; Debian 10-12 amd64, i386; Debian 13 amd64
@@ -16,9 +16,10 @@ under
 10.1 amd64, 11.0 i386, sparc),
 * OpenBSD (6.4, 6.7, 6.9, 7.6 i386; 7.9 i386, amd64),
 * Solaris (7 sparc; 9 sparc, i386; 10 i386, amd64),
-* AIX (5.3), and
+* AIX (5.3),
 * Mac OS X (10.5 powerpc; 10.6; 10.7; 10.9; 10.11; 10.13; 10.15; 11-15 amd64,
-arm64; 26 amd64, arm64; 27),
+arm64; 26 amd64, arm64; 27), and
+* Windows (11)
 
 but should need little to no modifications to run under any other
 reasonably recent system. The companion program `tnylpo-convert`
@@ -164,7 +165,22 @@ This approach allows the use of virtually any variant of the `make` utility
 Under AIX and Solaris (which are less standardized in respect to available
 compilers and libraries), you will have to adapt `build.sh` to your system
 before executing it (see the notes below).
+
+Under Windows, the build requires Cygwin (see below) and is done by
+running `sh dist.sh` in a Cygwin shell.
+
 ### Platform-specific notes:
+*Windows*: You will need Cygwin to build `tnylpo`. From the graphical Cygwin
+installer select and install `gcc-core`, `make`, `binutils`, `git`, `ncurses`
+and `ncurses-dev`.
+
+`build.sh` does not support Cygwin; run `sh dist.sh` instead. Besides
+the executables (which work within the current environment), it creates a
+zip archive you can distribute for usage on Windows machines that don't
+have Cygwin installed. It contains a standalone version consisting of the
+executables, necessary
+DLLs and minimal `TERMINFO` database, license files and the `mine` example.
+
 *Mac OS X*: The Xcode Command Line Tools (which can be installed with the
 command `xcode-select --install`) are sufficient to compile `tnylpo`,
 and the `ncurses` library is available by default.

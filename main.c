@@ -46,6 +46,22 @@
 
 #include "tnylpo.h"
 
+#ifdef __CYGWIN__
+#include <windows.h>
+
+/*
+ * set TERMINFO to our local datatabase
+ */
+static void
+set_terminfo_relative(void) {
+    char exe[MAX_PATH];
+    GetModuleFileNameA(NULL, exe, sizeof(exe));
+    char *slash = strrchr(exe, '\\'); if (slash) *slash = '\0';
+    char buf[MAX_PATH*2];
+    snprintf(buf, sizeof(buf), "%s\\terminfo", exe);
+    setenv("TERMINFO", buf, 1);
+}
+#endif
 
 /*
  * program name for error messages
@@ -1011,6 +1027,10 @@ premature_exit:
  */
 int
 main(int argc, char **argv) {
+#ifdef __CYGWIN__
+	set_terminfo_relative();
+#endif
+
 	int rc = 0;
 	prog_name = base_name(argv[0]);
 	if (! setlocale(LC_CTYPE, "")) {
