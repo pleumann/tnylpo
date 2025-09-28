@@ -245,7 +245,7 @@ you will have to extract the CCP and BDOS parts using the `dd` command,
 effectively creating a raw system image).
 
 ## How does CP/M (resp. how does `tcpm`) interact with `tnylpo`?
-`tnylpo` doesn't care too much about what happens with the data
+`tnylpo` doesn't care too much about what happens to the data
 structures it stored in the memory of the virtual machine; most of them are
 just initialized before program startup for the benefit of the application
 program (to supply it with a CP/M compatible environment) and are never

@@ -4,7 +4,7 @@
 version 2.2 under Unixy operating systems. It has been tested
 under
 * Linux
-  * Debian 8 i386, powerpc; Debian 9 amd64; Debian 10-12 amd64, i386
+  * Debian 8 i386, powerpc; Debian 9 amd64; Debian 10-12 amd64, i386; Debian 13 amd64
   * Ubuntu 18.04 LTS, 22.04 LTS, 24.04 LTS
   * CentOS 6 i386; CentOS 7
   * Rocky Linux 9.1
@@ -16,7 +16,7 @@ under
 * Solaris (7 sparc; 9 sparc, i386; 10 i386, amd64),
 * AIX (5.3), and
 * Mac OS X (10.5 powerpc; 10.6; 10.7; 10.9; 10.11; 10.13; 10.15; 11-15 amd64,
-arm64),
+arm64); 26 arm64,
 
 but should need little to no modifications to run under any other
 reasonably recent system. The companion program `tnylpo-convert`
