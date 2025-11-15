@@ -5,10 +5,12 @@ version 2.2 under Unixy operating systems. It has been tested
 under
 * Linux
   * Debian 8 i386, powerpc; Debian 9 amd64; Debian 10-12 amd64, i386; Debian 13 amd64
+  * Pi OS (Debian 13) 32-bit, 64-bit
   * Ubuntu 18.04 LTS, 22.04 LTS, 24.04 LTS
   * CentOS 6 i386; CentOS 7
   * Rocky Linux 9.1
-  * Slackware 14.2 i386,
+  * Slackware 14.2 i386
+  * Alpine Linux 3.22.2 i386, amd64,
 * FreeBSD (12.0 amd64; 13.0 i386; 14.2 amd64),
 * NetBSD (8.0 i386, sparc, vax; 9.2 amd64, sparc64, i386; 10.0 i386, sparc;
 10.1 amd64),
