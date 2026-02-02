@@ -187,7 +187,7 @@ A>
 ## What is the format of the disk images?
 `tcpm` disk images consist of 8192 records of 128 bytes and therefore have
 a total capacity of one megabyte. Logically, they are structured into 128
-tracks of 64 sectors each, of which the fist track is reserved for the
+tracks of 64 sectors each, of which the first track is reserved for the
 CP/M image and the second track contains the disk directory.
 
 The first sector on the first track contains a signature in its first two
