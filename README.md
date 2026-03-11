@@ -18,7 +18,7 @@ under
 * Solaris (7 sparc; 9 sparc, i386; 10 i386, amd64),
 * AIX (5.3), and
 * Mac OS X (10.5 powerpc; 10.6; 10.7; 10.9; 10.11; 10.13; 10.15; 11-15 amd64,
-arm64); 26 arm64,
+arm64; 26 arm64),
 
 but should need little to no modifications to run under any other
 reasonably recent system. The companion program `tnylpo-convert`
@@ -132,6 +132,7 @@ reported as working:
 * Research Machines RML Algol 4.1C
 * Micro Focus CIS Cobol 4.5
 * Digital Research Pascal MT+ 5.6.1
+* Manx Software Systems Aztec C 1.06D
 
 Notes:
 1. needs to be run with (resp. some features need) the `-s` (full-screen console) option.
