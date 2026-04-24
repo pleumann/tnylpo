@@ -908,6 +908,7 @@ crt_out(unsigned char c) {
 			 * restore cursor; extension to VT52
 			 */
 			if (! cursor_off) break;
+			cursor_off = 0;
 			if (old_cursor == ERR) break;
 			curs_set(old_cursor);
 			goto redraw_screen;
