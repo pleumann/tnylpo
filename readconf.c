@@ -147,6 +147,10 @@ int conf_save_end = 0;
 int conf_color = (-1);
 int conf_foreground = (-1);
 int conf_background = (-1);
+/*
+ * size of CP/M memory (0 resp. 8..65)
+ */
+int conf_memsize = (-1);
 
 
 /*
@@ -1227,7 +1231,8 @@ parse_config(void) {
 	    temp_screen_delay = (-1), temp_default_drive = (-1),
 	    temp_reverse_bs_del = (-1), temp_delay_count = (-1),
 	    temp_delay_nanoseconds = (-1), temp_color = (-1),
-	    temp_foreground = (-1), temp_background = (-1);
+	    temp_foreground = (-1), temp_background = (-1),
+	    temp_memsize = (-1);
 	enum dump temp_dump = 0;
 	wchar_t line[L_LINE];
 	size_t l;
@@ -1713,6 +1718,33 @@ parse_config(void) {
 				rc = (-1);
 				continue;
 			}
+		} else if (! wcscmp(token_ident, L"memory")) {
+			/*
+			 * defines the CP/M memory size in kilobytes
+			 */
+			get_token();
+			if (token != 'i' || wcscmp(token_ident, L"size")) {
+				pexpected("size");
+				rc = (-1);
+				continue;
+			}
+			get_token();
+			if (! check_equal(&rc)) continue;
+			if (temp_memsize != (-1)) {
+				predefined("memory size");
+				rc = (-1);
+				goto premature_exit;
+			}
+			get_token();
+			if (! check_number(&rc)) continue;
+			if (token_ul < 8 || token_ul > 65) {
+				perr("%s(%d): memory size out of range",
+				    cfn, ln);
+				rc = (-1);
+				continue;
+			}
+			temp_memsize = (int) token_ul;
+			get_token();
 		}
 		if (token) {
 			perr("%s(%d): syntax error", cfn, ln);
@@ -1742,6 +1774,7 @@ parse_config(void) {
 	if (conf_color == (-1)) conf_color = temp_color;
 	if (conf_foreground == (-1)) conf_foreground = temp_foreground;
 	if (conf_background == (-1)) conf_background = temp_background;
+	if (conf_memsize == (-1)) conf_memsize = temp_memsize;
 	if (delay_count == (-1)) {
 		delay_count = temp_delay_count;
 		delay_nanoseconds = temp_delay_nanoseconds;

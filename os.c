@@ -60,25 +60,39 @@
 #define ALV (MAGIC_ADDRESS - ALV_SIZE)
 #define DPB_SIZE 15
 #define DPB (ALV - DPB_SIZE)
-#define BIOS_VECTOR ((DPB - BIOS_VECTOR_COUNT * 3) & 0xff00)
-#define BIOS_START BIOS_VECTOR
-#define BIOS_SIZE (MEMORY_SIZE - BIOS_START)
-#define BDOS_SIZE 11
-#define BDOS_START (BIOS_START - BDOS_SIZE)
-#define SERIAL_NUMBER (BDOS_START - 6)
-#define CCP_STACK_COUNT 8
-#define CCP_STACK (SERIAL_NUMBER - CCP_STACK_COUNT * 2)
-#define CCP_START CCP_STACK
-#define CCP_SIZE (BDOS_START - CCP_START)
 #define TPA_START 0x0100
 #define BOOT 0x0000
 #define IOBYTE 0x0003
 #define DRVUSER 0x0004
-#define BDOS_ENTRY 0x0005
+#define BDOS_VECTOR 0x0005
 #define DEFAULT_FCB_1 0x005c
 #define DEFAULT_FCB_2 0x006c
 #define DEFAULT_DMA 0x0080
 #define DMA_SIZE 128
+/*
+ * sizes for minimal BIOS/BDOS/CCP areas
+ */
+#define MIN_BIOS_SIZE (MEMORY_SIZE - ((DPB - BIOS_VECTOR_COUNT * 3) & 0xff00))
+#define MIN_BDOS_SIZE (6 + 3 + 4 * 2)
+#define CCP_STACK_COUNT 8
+#define MIN_CCP_SIZE (CCP_STACK_COUNT * 2)
+/*
+ * sizes for stock CP/M 2 BDOS and CCP areas
+ */
+#define STOCK_BDOS_SIZE 3584
+#define STOCK_CCP_SIZE 2048
+
+/*
+ * these addresses can be modified by the -m/memory size option
+ */
+static int bios_start = MEMORY_SIZE - MIN_BIOS_SIZE;
+static int bdos_start = MEMORY_SIZE - MIN_BIOS_SIZE - MIN_BDOS_SIZE;
+static int ccp_start =
+    MEMORY_SIZE - MIN_BIOS_SIZE - MIN_BDOS_SIZE - MIN_CCP_SIZE;
+
+#define BDOS_SERIAL bdos_start
+#define BDOS_ENTRY (bdos_start + 6)
+#define BIOS_VECTOR bios_start
 
 
 /*
@@ -148,7 +162,7 @@ get_bc(void) { int bc = reg_b; bc <<= 8; bc |= reg_c; return bc; }
  * return the highest address of the TPA
  */
 int
-get_tpa_end(void) { return BDOS_START - 1; }
+get_tpa_end(void) { return bdos_start - 1; }
 
 
 /*
@@ -804,6 +818,14 @@ os_init(void) {
 	unsigned char *tpa_p;
 	wchar_t buffer[DMA_SIZE], *bp;
 	/*
+	 * adjust CP/M addresses if requested by the -m/memory size option
+	 */
+	if (conf_memsize) {
+		ccp_start = (conf_memsize - 8) * 1024 + 0x400;
+		bdos_start = ccp_start + STOCK_CCP_SIZE;
+		bios_start = bdos_start + STOCK_BDOS_SIZE;
+	}
+	/*
 	 * reset disk subsystem
 	 */
 	disk_reset();
@@ -883,7 +905,7 @@ os_init(void) {
 	 * this is deliberately more than CCP_START - TPA_START to
 	 * catch a command file which doesn't fit the TPA
 	 */
-	tpa_free = BDOS_START - TPA_START;
+	tpa_free = bdos_start - TPA_START;
 	while (tpa_free) {
 		l = fread(tpa_p, 1, tpa_free, fp);
 		if (! l) {
@@ -899,7 +921,7 @@ os_init(void) {
 	/*
 	 * check for overrun
 	 */
-	if (tpa_free < BDOS_START - CCP_START) {
+	if (tpa_free < bdos_start - ccp_start) {
 		perr("command file %s too large", command_file);
 		rc = (-1);
 		goto premature_exit;
@@ -911,27 +933,27 @@ os_init(void) {
 	/*
 	 * set up CCP 8-level stack with a pushed return address to WBOOT
 	 */
-	reg_sp = SERIAL_NUMBER;
+	reg_sp = BDOS_SERIAL;
 	memory[--reg_sp] = (((BIOS_VECTOR + 3) >> 8) & 0xff);
 	memory[--reg_sp] = ((BIOS_VECTOR + 3) & 0xff);
 	/*
 	 * set up CP/M serial number
 	 */
-	memcpy(memory + SERIAL_NUMBER, serial_number, sizeof serial_number);
+	memcpy(memory + BDOS_SERIAL, serial_number, sizeof serial_number);
 	/*
 	 * set up BDOS (jp to MAGIC_ADDRESS + 0)
 	 */
-	memory[BDOS_START] = 0xc3 /* jp */;
-	memory[BDOS_START + 1] = (MAGIC_ADDRESS & 0xff);
-	memory[BDOS_START + 2] = ((MAGIC_ADDRESS >> 8) & 0xff);
+	memory[BDOS_ENTRY] = 0xc3 /* jp */;
+	memory[BDOS_ENTRY + 1] = (MAGIC_ADDRESS & 0xff);
+	memory[BDOS_ENTRY + 2] = ((MAGIC_ADDRESS >> 8) & 0xff);
 	/*
 	 * four dummy error vectors all point to WBOOT magic address
 	 */
-	memory[BDOS_START + 3] = memory[BDOS_START + 5] =
-	    memory[BDOS_START + 7] = memory[BDOS_START + 9] =
+	memory[BDOS_ENTRY + 3] = memory[BDOS_ENTRY + 5] =
+	    memory[BDOS_ENTRY + 7] = memory[BDOS_ENTRY + 9] =
 	       ((MAGIC_ADDRESS + 2) & 0xff);
-	memory[BDOS_START + 4] = memory[BDOS_START + 6] =
-	    memory[BDOS_START + 8] = memory[BDOS_START + 10] =
+	memory[BDOS_ENTRY + 4] = memory[BDOS_ENTRY + 6] =
+	    memory[BDOS_ENTRY + 8] = memory[BDOS_ENTRY + 10] =
 	       (((MAGIC_ADDRESS + 2) >> 8) & 0xff);
 
 	/*
@@ -1013,9 +1035,9 @@ os_init(void) {
 	/*
 	 * set up BDOS entry point
 	 */
-	memory[BDOS_ENTRY] = 0xc3 /* jp */;
-	memory[BDOS_ENTRY + 1] = (BDOS_START & 0xff);
-	memory[BDOS_ENTRY + 2] = ((BDOS_START >> 8) & 0xff);
+	memory[BDOS_VECTOR] = 0xc3 /* jp */;
+	memory[BDOS_VECTOR + 1] = (BDOS_ENTRY & 0xff);
+	memory[BDOS_VECTOR + 2] = ((BDOS_ENTRY >> 8) & 0xff);
 	/*
 	 * convert command line arguments to wchar_t and splice them into
 	 * a DMA_SIZEd buffer (maximal 127 characters + terminator)

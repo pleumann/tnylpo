@@ -164,6 +164,7 @@ extern int delay_nanoseconds;
 extern int conf_color;
 extern int conf_foreground;
 extern int conf_background;
+extern int conf_memsize;
 
 
 /*

@@ -27,7 +27,7 @@
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH tnylpo 1 2021-04-28
+.TH tnylpo 1 2026-06-07
 .SH NAME
 tnylpo \- a utility to run programs written for CP/M-80
 .SH SYNOPSIS
@@ -53,6 +53,10 @@ tnylpo \- a utility to run programs written for CP/M-80
 .RB [ -f
 .IR <config-file> ]
 .RB [ -l
+.RI ( <n>
+|
+.BR @ )]
+.RB [ -m
 .RI ( <n>
 |
 .BR @ )]
@@ -753,6 +757,27 @@ turns all dumps off (this is also the default setting). Dumps are only written
 if a log file has been defined by the configuration option
 .BR logfile .
 .RE
+.PP
+.B memory size =
+.I <number>
+.br
+command line option
+.B -m
+.RI ( <number>
+|
+.BR @ )
+.RS
+.PP
+changes the memory layout of the emulated system to correspond to the
+layout of stock CP/M 2 configured for a memory size of
+.I <number>
+kilobytes. Without this option (or if
+.B -m @
+is specified on the command line), a more compact memory layout is
+used, increasing the TPA size by about 4 kilobytes. Details are explained
+below (see
+.BR "Memory layout" ).
+.RE
 .SS Terminal emulation
 tnylpo provides a
 .B curses
@@ -1248,6 +1273,60 @@ CP/M
 0x0a) and
 .I vice versa
 in this mode.
+.SS Memory layout
+.PP
+By default, tnylpo will use a very compact memory layout: The BIOS area
+contains little more than the BIOS jump vector, the dummy disk allocation
+vector, and the dummy
+disk parameter block; since many application programs assume the BIOS vector to
+be page aligned, the BIOS area occupies the top 256 bytes of the Z80 address
+space. Immediately before the BIOS area is a minimal BDOS area containing the
+BDOS serial number and the four-element dummy BDOS error vector; the BDOS
+area is preceded by a rudimentary CCP area in the form an eight-level
+stack, to which the SP register points at program activation. This
+layout maximizes the size of the TPA, which is more than four kilobytes larger
+than the TPA of a 64 kilobyte CP/M 2 system.
+.PP
+While a compact memory layout is usually beneficial, there are situations in
+which a more faithful emulation of the memory layout of CP/M 2 is desirable:
+Programs compiled and tested under tnylpo may not run under CP/M due to lack of
+memory (e.g. Turbo Pascal 3 by default creates executables which for
+execution require at least the amount of memory available on the system used
+for compilation). Other programs
+might rely on the standard size and alignment characteristics of the BDOS
+area (which is implicitly page aligned under CP/M 2). In addition, a facility
+for reducing the amount of available memory for testing purposes has been
+suggested by a user (Hi, Jeffrey!).
+.PP
+The
+.B "memory size"
+configuration option (and its corresponding
+.B "-m"
+command line option) addresses these issues; it takes an integer
+.I <size>
+argument
+in the range of 20 to 64 and
+modifies the memory layout of tnylpo to correspond to the memory layout
+of a stock CP/M 2 system configured (by
+.BR MOVCPM.COM )
+for a main memory of
+.I <size>
+kilobytes: The BDOS area is 3584
+bytes in length and starts at address
+.BR "(<size> - 8) * 1024 + 0x0c00" ,
+the BIOS area starts at address
+.BR "(<size> - 8) * 1024 + 0x1a00" ,
+and the 2048 byte CCP area starting at address
+.B "(<size> - 8) * 1024 + 0x0400"
+may not be overwritten by loading the executable (actually, tnylpo accepts
+.I <size>
+arguments in the range of 8 to 65 which result in
+TPA sizes from 768 to 61184 bytes, but such configurations are not possible
+resp. are not supported under CP/M 2).
+.PP
+This option does not reduce the amount of memory accessible by the
+emulated CPU \(emthere are always 64 kilobytes, but all memory beyond the
+BDOS area is presented as part of the BIOS.
 .SS Saving a memory image
 .PP
 The command line option
@@ -1546,8 +1625,8 @@ By design, there are some incompatibilities between CP/M-80 and the
 emulation provided by tnylpo:
 .SS Direct access to the BDOS and BIOS areas
 Since it doesn't contain any actual
-CP/M code, all programs trying to patch the BDOS or otherwise make
-assumptions about the layout of the operating system or its internal
+CP/M code, all programs trying to patch the BDOS or otherwise making
+assumptions about its internal
 data structures will fail while running on tnylpo. 
 .PP
 BDOS and BIOS function emulations are activated by the simulated processor
@@ -1557,22 +1636,25 @@ of the CP/M memory space (0xffed for the BDOS entry, 0xffee to 0xfffe for the
 routine hiding as 18th BIOS entry); this use of "magic addresses" might
 confuse debuggers trying to trace system calls.
 .PP
-The BIOS area (starting three bytes before the address
-stored at 0x0001) is page-aligned and contains the 17(+1)-element
-BIOS jump vector,
-the dummy disk structures (see below) and the above mentioned 19 RET
-instructions. The BDOS area (starting at the address stored at 0x0006) is
-even shorter, containing only a jump to 0xffed and the table 
-of target addresses for the four fatal BDOS error conditions
-(non-existing disk, bad sector, read-only disk, and read-only file;
-these addresses may be modified by an application program, but are completely
-ignored by tnylpo). Any program expecting the BDOS or the BIOS areas to have
-the sizes and alignment characteristics of a real CP/M-80 environment will be
-disappointed.
+The OS serial number stored in the first six bytes of the BDOS area (i.e. at
+the address
+.BR "[0x0006] - 6" )
+is always
+.BR "0x00 0x16 0x00 0xc0 0xff 0xee" ,
+a (hopefully inoffensive) dummy indicating BDOS version 2.2.
+The address table for the four fatal BDOS error conditions (non-existing disk,
+bad sector, read-only disk, and read-only file) at address
+.B "[0x0006] + 3"
+is initialized with pointers to the WBOOT entry in the BIOS vector; it may be
+modified by an application program, but is ignored by tnylpo.
 .PP
-The OS serial number stored in the six bytes immediately before the
-BDOS area is always 0x00 0x16 0x00 0xc0 0xff 0xee, a (hopefully inoffensive)
-dummy indicating BDOS version 2.2.
+Unless explicitly requested by the
+.B "memory size"
+configuration option (resp. the
+.B "-m"
+command line option), the sizes and alignment characteristics of the BDOS and
+BIOS areas differ from those of CP/M 2 (see
+.BR "Memory layout" ).
 .PP
 .SS Direct access to the disk drives
 All programs trying to access the CP/M disk structure directly

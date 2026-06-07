@@ -183,6 +183,7 @@ usage(void) {
 	perr("                     save memory to file <fn> after execution");
 	perr("    -f <fn>          read configuration from file <fn>");
 	perr("    -l (<n>|@)       number of full screen mode lines *");
+	perr("    -m (<n>|@)       set CP/M memory size in kilobytes");
 	perr("    -n               never actually close files");
 	perr("    -o (n|y|[y,]<fg>,<bg>)");
 	perr("                     use colors *");
@@ -451,12 +452,12 @@ parse_save(void) {
 		}
 	}
 	/*
-	 * if no range has been specified, the whole TPA will be saved
+	 * if no range has been specified, the whole TPA will be saved;
+	 * unfortunately, since the -m/memory size option has been
+	 * introduced, we cannot be sure about the end address of the
+	 * TPA yet, so we leave it at (-1)
 	 */
-	if (! range_set) {
-		conf_save_start = 0x100;
-		conf_save_end = get_tpa_end();
-	}
+	if (! range_set) conf_save_start = 0x100;
 	/*
 	 * a file name must be specified and it may not be empty
 	 */
@@ -579,7 +580,7 @@ get_config(int argc, char **argv) {
 	unsigned long ul;
 	opterr = 0;
 	while ((opt = getopt(argc, argv,
-	    "abc:d:e:f:l:no:rst:v:wy:z:")) != EOF) {
+	    "abc:d:e:f:l:m:no:rst:v:wy:z:")) != EOF) {
 		switch (opt) {
 		case 'a':
 			/*
@@ -852,6 +853,34 @@ get_config(int argc, char **argv) {
 				if (parse_color()) rc = (-1);
 			}
 			break;
+		case 'm':
+			/*
+			 * set CP/M memory size in KB; this feature has been
+			 * inspired by a proposed patch by Jeffrey H. Johnson
+			 */
+			if (conf_memsize != (-1)) {
+				only_once('m');
+				rc = (-1);
+			} else {
+				if (! strcmp(optarg, "@")) {
+					/*
+					 * use default memory configuration
+					 */
+					conf_memsize = 0;
+				} else {
+					/*
+					 * memory size is in the range 8..65
+					 */
+					ul = strtoul(optarg, &cp, 10);
+					if (*cp || ul > 65 || ul < 8) {
+						perr("invalid memory size");
+						rc = (-1);
+					} else {
+						conf_memsize = (int) ul;
+					}
+				}
+			}
+			break;
 		case '?':
 			perr("invalid option -%c", optopt);
 			rc = (-1);
@@ -943,6 +972,11 @@ get_config(int argc, char **argv) {
 	if (conf_color == (-1)) conf_color = 0; /* no color */
 	if (conf_foreground == (-1)) conf_foreground = 7; /* white */
 	if (conf_background == (-1)) conf_background = 0; /* black */
+	/*
+	 * if no memory size has been set in the configuration file or
+	 * on the command line, use the default configuration
+	 */
+	if (conf_memsize == (-1)) conf_memsize = 0;
 	/*
 	 * default mode is batch
 	 */

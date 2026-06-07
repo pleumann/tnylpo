@@ -3080,8 +3080,13 @@ cpu_exit(void) {
 		if (conf_save_file) {
 			/*
 			 * save (part of) the Z80 memory area
-			 * on regular program termination
+			 * on regular program termination; if the
+			 * end address has not been specified,
+			 * use the end of the TPA as end address
 			 */
+			if (conf_save_end == (-1)) {
+				conf_save_end = get_tpa_end();
+			}
 			if (conf_save_hex) {
 				if (save_memory_hex()) rc = (-1);
 			} else {
