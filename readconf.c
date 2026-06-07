@@ -1737,6 +1737,12 @@ parse_config(void) {
 			}
 			get_token();
 			if (! check_number(&rc)) continue;
+			/*
+			 * legal values are in the range from 8 to 65,
+			 * but only values in the range from 20 to 64
+			 * correspond to admissible CP/M 2 memory
+			 * configurations
+			 */
 			if (token_ul < 8 || token_ul > 65) {
 				perr("%s(%d): memory size out of range",
 				    cfn, ln);
