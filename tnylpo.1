@@ -1282,7 +1282,7 @@ disk parameter block; since many application programs assume the BIOS vector to
 be page aligned, the BIOS area occupies the top 256 bytes of the Z80 address
 space. Immediately before the BIOS area is a minimal BDOS area containing the
 BDOS serial number and the four-element dummy BDOS error vector; the BDOS
-area is preceded by a rudimentary CCP area in the form an eight-level
+area is preceded by a rudimentary CCP area in the form of an eight-level
 stack, to which the SP register points at program activation. This
 layout maximizes the size of the TPA, which is more than four kilobytes larger
 than the TPA of a 64 kilobyte CP/M 2 system.
