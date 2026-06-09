@@ -27,7 +27,7 @@
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH tnylpo 1 2026-06-07
+.TH tnylpo 1 2026-06-09
 .SH NAME
 tnylpo \- a utility to run programs written for CP/M-80
 .SH SYNOPSIS
@@ -1295,8 +1295,8 @@ execution require at least the amount of memory available on the system used
 for compilation). Other programs
 might rely on the standard size and alignment characteristics of the BDOS
 area (which is implicitly page aligned under CP/M 2). In addition, a facility
-for reducing the amount of available memory for testing purposes has been
-suggested by a user (Hi, Jeffrey!).
+for reducing the amount of available memory for testing purposes may be
+useful.
 .PP
 The
 .B "memory size"
@@ -1318,11 +1318,12 @@ the BIOS area starts at address
 .BR "(<size> - 8) * 1024 + 0x1a00" ,
 and the 2048 byte CCP area starting at address
 .B "(<size> - 8) * 1024 + 0x0400"
-may not be overwritten by loading the executable (actually, tnylpo accepts
+may not be overwritten by loading the executable. Actually, tnylpo accepts
 .I <size>
 arguments in the range of 8 to 65 which result in
-TPA sizes from 768 to 61184 bytes, but such configurations are not possible
-resp. are not supported under CP/M 2).
+TPA sizes from 768 to 59136 bytes (plus 2054 bytes, if one adds the CCP
+area and the CP/M serial number), but the additional configurations are not
+possible resp. are not supported under CP/M 2.
 .PP
 This option does not reduce the amount of memory accessible by the
 emulated CPU \(emthere are always 64 kilobytes, but all memory beyond the
