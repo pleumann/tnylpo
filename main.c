@@ -187,6 +187,7 @@ usage(void) {
 	perr("    -n               never actually close files");
 	perr("    -o (n|y|[y,]<fg>,<bg>)");
 	perr("                     use colors *");
+	perr("    -p               be pedantic about buggy applications");
 	perr("    -r               reverse backspace and delete keys *");
 	perr("    -s               use full screen mode console");
 	perr("    -t (<n>|@)       delay before exiting full screen mode *");
@@ -462,7 +463,7 @@ parse_save(void) {
 	 * a file name must be specified and it may not be empty
 	 */
 	if (! conf_save_file || ! *conf_save_file) {
-		perr("suboption -e: no file name specified");
+		perr("option -e: no file name specified");
 		rc = (-1);
 		goto premature_exit;
 	}
@@ -580,7 +581,7 @@ get_config(int argc, char **argv) {
 	unsigned long ul;
 	opterr = 0;
 	while ((opt = getopt(argc, argv,
-	    "abc:d:e:f:l:m:no:rst:v:wy:z:")) != EOF) {
+	    "abc:d:e:f:l:m:no:prst:v:wy:z:")) != EOF) {
 		switch (opt) {
 		case 'a':
 			/*
@@ -881,6 +882,17 @@ get_config(int argc, char **argv) {
 				}
 			}
 			break;
+		case 'p':
+			/*
+			 * be pedantic about buggy applications
+			 */
+			if (be_pedantic != (-1)) {
+				only_once('p');
+				rc = (-1);
+			}
+			be_pedantic = 1;
+			break;
+
 		case '?':
 			perr("invalid option -%c", optopt);
 			rc = (-1);
@@ -978,6 +990,10 @@ get_config(int argc, char **argv) {
 	 */
 	if (conf_memsize == (-1)) conf_memsize = 0;
 	/*
+	 * don't be pedantic as default
+	 */
+	if (be_pedantic == (-1)) be_pedantic = 0;
+	/*
 	 * default mode is batch
 	 */
 	if (conf_interactive == (-1)) conf_interactive = 0;
@@ -1018,6 +1034,7 @@ main(int argc, char **argv) {
 	 */
 	if (get_config(argc, argv)) {
 		perr("command line or configuration error");
+		rc = (-1);
 		goto premature_exit;
 	}
 	/*

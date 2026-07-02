@@ -151,7 +151,10 @@ int conf_background = (-1);
  * size of CP/M memory (0 resp. 8..65)
  */
 int conf_memsize = (-1);
-
+/*
+ * be pedantic about buggy applications
+ */
+int be_pedantic = (-1);
 
 /*
  * maximal length of a line in the configuration file
@@ -1232,7 +1235,7 @@ parse_config(void) {
 	    temp_reverse_bs_del = (-1), temp_delay_count = (-1),
 	    temp_delay_nanoseconds = (-1), temp_color = (-1),
 	    temp_foreground = (-1), temp_background = (-1),
-	    temp_memsize = (-1);
+	    temp_memsize = (-1), temp_be_pedantic = (-1);
 	enum dump temp_dump = 0;
 	wchar_t line[L_LINE];
 	size_t l;
@@ -1751,7 +1754,15 @@ parse_config(void) {
 			}
 			temp_memsize = (int) token_ul;
 			get_token();
-		}
+		} else if (! wcscmp(token_ident, L"pedantic")) {
+			/*
+			 * be pedantic about buggy applications
+			 */
+			if (parse_boolean(&temp_be_pedantic) == (-1)) {
+				rc = (-1);
+				continue;
+			}
+		} 
 		if (token) {
 			perr("%s(%d): syntax error", cfn, ln);
 			rc = (-1);
@@ -1781,6 +1792,7 @@ parse_config(void) {
 	if (conf_foreground == (-1)) conf_foreground = temp_foreground;
 	if (conf_background == (-1)) conf_background = temp_background;
 	if (conf_memsize == (-1)) conf_memsize = temp_memsize;
+	if (be_pedantic == (-1)) be_pedantic = temp_be_pedantic;
 	if (delay_count == (-1)) {
 		delay_count = temp_delay_count;
 		delay_nanoseconds = temp_delay_nanoseconds;

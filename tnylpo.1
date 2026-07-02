@@ -27,13 +27,13 @@
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH tnylpo 1 2026-06-09
+.TH tnylpo 1 2026-07-02
 .SH NAME
 tnylpo \- a utility to run programs written for CP/M-80
 .SH SYNOPSIS
 .PP
 .B tnylpo 
-.RB [ -abnrsw ]
+.RB [ -abnprsw ]
 .RB [ -c
 .RI ( <n>
 |
@@ -424,7 +424,7 @@ command line option
 .I <level>
 .RS
 .PP
-The amount of data written to the logfile is controlled by the
+The amount of data written to the log file is controlled by the
 .B loglevel
 configuration option resp. its command line equivalent
 .BR -v .
@@ -777,6 +777,40 @@ is specified on the command line), a more compact memory layout is
 used, increasing the TPA size by about 4 kilobytes. Details are explained
 below (see
 .BR "Memory layout" ).
+.RE
+.PP
+.B pedantic =
+.RB ( true
+|
+.BR false )
+.br
+command line option
+.B -p
+.RS
+.PP
+By default, tnylpo tries to accommodate buggy programs passing invalid
+FCBs to system calls (like trying to close an unopened FCB) by simply
+returning an error indication to the caller (and writing an entry to the
+log file); the effects of such calls
+are undefined under CP/M and can (under certain circumstances) cause
+directory and data corruption on the disk (although typically, they
+equally return just an error code). If
+.B pedantic 
+is set to
+.B true
+(or if the
+.B -p
+command line option is present), tnylpo will instead terminate the
+execution of the offending program and print an error message.
+.PP
+Note that earlier versions of tnylpo always terminated programs passing
+invalid data to system calls.
+.B pedantic = yes
+(resp. the
+.B -p
+command line option) reverts to this earlier behaviour for the benefit
+of the worrying number of people developing and testing new software
+under tnylpo.
 .RE
 .SS Terminal emulation
 tnylpo provides a

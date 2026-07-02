@@ -756,8 +756,10 @@ get_filedata_pp(int fcb, const char *caller) {
 	t |= memory[fcb + 18];
 	if ((id ^ t) != FILE_QUUX) {
 		plog("%s (FCB 0x%04x): invalid file ID in FCB", caller, fcb);
-		terminate = 1;
-		term_reason = ERR_LOGIC;
+		if (be_pedantic) {
+			terminate = 1;
+			term_reason = ERR_LOGIC;
+		}
 		goto premature_exit;
 	}
 	/*
@@ -771,8 +773,10 @@ get_filedata_pp(int fcb, const char *caller) {
 	 */
 	if (! *fdpp || (*fdpp)->id != id) {
 		plog("%s (FCB 0x%04x): stale file ID in FCB", caller, fcb);
-		terminate = 1;
-		term_reason = ERR_LOGIC;
+		if (be_pedantic) {
+			terminate = 1;
+			term_reason = ERR_LOGIC;
+		}
 		fdpp = NULL;
 		goto premature_exit;
 	}
