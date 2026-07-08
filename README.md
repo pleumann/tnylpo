@@ -133,6 +133,7 @@ reported as working:
 * Micro Focus CIS Cobol 4.5
 * Digital Research Pascal MT+ 5.6.1
 * Manx Software Systems Aztec C 1.06D
+* PopCom 1.00 by Yoshihiko Mino
 
 Notes:
 1. needs to be run with (resp. some features need) the `-s` (full-screen console) option.
@@ -237,6 +238,10 @@ install `tnylpo` with the command `pkg_add tnylpo`.
 MacOS users. If you have MacPorts installed, you can add `tnylpo` to your
 system by typing `sudo port install tnylpo` in a terminal window.
 
+Please bear in mind that these binary packages are often based on
+outdated versions of the `tnylpo` source code; to get the latest
+features and bug fixes, I recommend compiling your own binaries from the
+source.
 ## I don't want to read 1000+ lines just to run a program!
 All CP/M program and data file names are expected in lower case;
 files called `TURBO.COM`, `M80.COM`, or `PGRM.MAC` need to be
