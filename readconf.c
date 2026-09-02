@@ -1327,7 +1327,7 @@ parse_config(void) {
 			 * a CP/M character
 			 */
 			get_token();
-			if (token != '0' || token_ul > 256) {
+			if (token != '0' || token_ul > 255) {
 				pexpected("number (0..255)");
 				rc = (-1);
 				continue;

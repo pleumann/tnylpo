@@ -318,6 +318,7 @@ main(int argc, char **argv) {
 	 */
 	if (get_config(argc, argv)) {
 		perr("command line or configuration error");
+		rc = (-1);
 		goto premature_exit;
 	}
 	/*

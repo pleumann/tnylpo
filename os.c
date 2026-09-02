@@ -2126,7 +2126,7 @@ bdos_delete_file(void) {
 		/*
 		 * build path
 		 */
-		path = alloc(sizeof conf_drives[drive] + strlen(tp->name) + 2);
+		path = alloc(strlen(conf_drives[drive]) + strlen(tp->name) + 2);
 		sprintf(path, "%s/%s", conf_drives[drive], tp->name);
 		/*
 		 * delete file
