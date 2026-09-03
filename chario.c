@@ -380,7 +380,10 @@ console_status(void) {
 		tv.tv_sec = 0;
 		tv.tv_usec = 0;
 		t = select(fileno(stdin) + 1, &in_set, NULL, NULL, &tv);
-		s = (t != 0);
+		/*
+		 * ignore errors from select()
+		 */
+		s = (t == 1);
 	}
 	return s;
 }

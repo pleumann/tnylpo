@@ -905,9 +905,11 @@ static int
 cpm_drive(wchar_t c) {
 	int rc = (-1);
 	wchar_t *cp;
-	static const wchar_t drives[16] = L"abcdefghijklmnop";
-	cp = wcschr(drives, towlower(c));
-	if (cp) rc = cp - drives;
+	static const wchar_t drives[] = L"abcdefghijklmnop";
+	if (c) {
+		cp = wcschr(drives, towlower(c));
+		if (cp) rc = cp - drives;
+	}
 	return rc;
 }
 
@@ -935,13 +937,13 @@ CHECK(number, '0', "number")
 
 
 /*
- * string in character definition may contain only a single character
+ * string in character definition must contain exactly one character
  */
 static int
 check_char(int *rc_p) {
 	if (! check_string(rc_p)) return 0;
-	if (wcslen(token_string) > 1) {
-		perr("%s(%d): string may contain only one character", cfn, ln);
+	if (wcslen(token_string) != 1) {
+		perr("%s(%d): string must contain a single character", cfn, ln);
 		*rc_p = (-1);
 		return 0;
 	}
@@ -1513,7 +1515,7 @@ parse_config(void) {
 				rc = (-1);
 				continue;
 			}
-			if (temp_dont_close != (-1)) {
+			if (temp_altkeys != (-1)) {
 				predefined("application cursor");
 				rc = (-1);
 				continue;
@@ -1538,7 +1540,7 @@ parse_config(void) {
 				rc = (-1);
 				continue;
 			}
-			if (parse_boolean(&reverse_bs_del) == (-1)) {
+			if (parse_boolean(&temp_reverse_bs_del) == (-1)) {
 				rc = (-1);
 				continue;
 			}

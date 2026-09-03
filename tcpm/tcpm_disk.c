@@ -251,7 +251,7 @@ premature_exit:
 		free(sys_image);
 		sys_image = NULL;
 	}
-	fclose(fp);
+	if (fp) fclose(fp);
 	return rc;
 }
 
@@ -260,12 +260,12 @@ premature_exit:
  * read program file
  */
 static int
-get_program(const char *fn) {
+get_program(void) {
 	int rc = 0, i, c;
 	FILE *fp = NULL;
 	const char *name, *ext, *dot;
-	static const char valid[] = "@$#-0123456789ABCDEFGHIJKLMNOPqRSTUVWXYZ";
-	size_t l, tl, l_name, l_ext;
+	static const char valid[] = "@$#-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	size_t l, l_name, l_ext;
 	char *tp;
 	/*
 	 * check file name for compatibility with CP/M and construct
@@ -363,7 +363,7 @@ premature_exit:
 		free(prog_image);
 		prog_image = NULL;
 	}
-	fclose(fp);
+	if (fp) fclose(fp);
 	return rc;
 }
 
@@ -458,10 +458,12 @@ do_sys(void) {
 		if (rc) goto premature_exit;
 	}
 premature_exit:
-	if (fclose(fp)) {
-		perr("%s: cannot close: %s", image_fn,
-		    strerror(errno));
-		rc = (-1);
+	if (fp) {
+		if (fclose(fp)) {
+			perr("%s: cannot close: %s", image_fn,
+			    strerror(errno));
+			rc = (-1);
+		}
 	}
 	return rc;
 }
@@ -496,10 +498,12 @@ do_nosys(void) {
 		if (rc) goto premature_exit;
 	}
 premature_exit:
-	if (fclose(fp)) {
-		perr("%s: cannot close: %s", image_fn,
-		    strerror(errno));
-		rc = (-1);
+	if (fp) {
+		if (fclose(fp)) {
+			perr("%s: cannot close: %s", image_fn,
+			    strerror(errno));
+			rc = (-1);
+		}
 	}
 	return rc;
 }
@@ -629,10 +633,12 @@ do_create(void) {
 		}
 	}
 premature_exit:
-	if (fclose(fp)) {
-		perr("%s: cannot close: %s", image_fn,
-		    strerror(errno));
-		rc = (-1);
+	if (fp) {
+		if (fclose(fp)) {
+			perr("%s: cannot close: %s", image_fn,
+			    strerror(errno));
+			rc = (-1);
+		}
 	}
 	return rc;
 }
@@ -669,7 +675,7 @@ main(int argc, char **argv) {
 	 * read program file
 	 */
 	if (command == CMD_CREATE && program_fn) {
-		rc = get_program(program_fn);
+		rc = get_program();
 		if (rc) goto premature_exit;
 	}
 	/*

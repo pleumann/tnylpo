@@ -39,6 +39,7 @@
 #include <errno.h>
 
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "tnylpo.h"
 
@@ -296,10 +297,11 @@ write_cpm(unsigned char uc) {
  */
 int
 main(int argc, char **argv) {
-	int rc = 0, t, last_was_cr, convert_error = 0;
+	int rc = 0, t, last_was_cr, convert_error = 0, temp_fd;
 	wint_t wc;
 	unsigned char uc;
 	char *temp_name = NULL;
+	off_t temp_size;
 	prog_name = base_name(argv[0]);
 	if (! setlocale(LC_CTYPE, "")) {
 		perr("setlocale(LC_CTYPE) failed");
@@ -347,10 +349,28 @@ main(int argc, char **argv) {
 		temp_name = alloc(strlen(target_name) + 30);
 		sprintf(temp_name, "%s.temp.%lu", target_name,
 		    (unsigned long) getpid());
-		target_fp = fopen(temp_name, target_unix ? "w" : "wb");
+		/*
+		 * make sure that creating the temporary target file
+		 * doesn't overwrite anything
+		 */
+		temp_fd = open(temp_name, O_WRONLY | O_TRUNC | O_CREAT | O_EXCL,		     0666);
+		if (temp_fd == (-1)) {
+			perr("couldn\'t create %s: %s", temp_name,
+			    strerror(errno));
+			rc = (-1);
+			goto premature_exit;
+		}
+		/*
+		 * convert file descriptor to stdio file pointer	
+		 */
+		target_fp = fdopen(temp_fd, target_unix ? "w" : "wb");
 		if (! target_fp) {
 			perr("couldn\'t open %s: %s", temp_name,
 			    strerror(errno));
+			/*
+			 * remove temporary file
+			 */
+			unlink(temp_name);
 			rc = (-1);
 			goto premature_exit;
 		}
@@ -435,7 +455,15 @@ main(int argc, char **argv) {
 	if (! target_unix) {
 		if (append_cntrlz) write_cpm(0x1a /* SUB */);
 		if (! omit_padding) {
-			while (target_size % 128) write_cpm(0x1a /* SUB */);
+			while (target_size % 128) {
+				/*
+				 * avoid potential endless loop in case
+				 * of a full disk
+				 */
+				temp_size = target_size;
+				write_cpm(0x1a /* SUB */);
+				if (target_size == temp_size) break;
+			}
 		}
 	}
 	/*

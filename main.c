@@ -258,7 +258,7 @@ parse_delay(int *count_p, int *nanoseconds_p) {
 				rc = (-1);
 			} else {
 				ul = strtoul(cp + 1, &cp, 10);
-				if (ul < 1 || ul > INT_MAX) {
+				if (*cp || ul < 1 || ul > INT_MAX) {
 					perr("invalid nanosecond value in -y "
 					    "option argument");
 					rc = (-1);
