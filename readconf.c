@@ -1238,6 +1238,7 @@ parse_config(void) {
 	    temp_delay_nanoseconds = (-1), temp_color = (-1),
 	    temp_foreground = (-1), temp_background = (-1),
 	    temp_memsize = (-1), temp_be_pedantic = (-1);
+	char *temp_printer = NULL;
 	enum dump temp_dump = 0;
 	wchar_t line[L_LINE];
 	size_t l;
@@ -1683,7 +1684,7 @@ parse_config(void) {
 			/*
 			 * printer file definition
 			 */
-			if (parse_aux("printer", &conf_printer,
+			if (parse_aux("printer", &temp_printer,
 			    &conf_printer_raw)) {
 			    	rc = (-1);
 				continue;
@@ -1795,6 +1796,11 @@ parse_config(void) {
 	if (conf_background == (-1)) conf_background = temp_background;
 	if (conf_memsize == (-1)) conf_memsize = temp_memsize;
 	if (be_pedantic == (-1)) be_pedantic = temp_be_pedantic;
+	if (! conf_printer) {
+		conf_printer = temp_printer;
+	} else {
+		free(temp_printer);
+	}
 	if (delay_count == (-1)) {
 		delay_count = temp_delay_count;
 		delay_nanoseconds = temp_delay_nanoseconds;

@@ -188,6 +188,7 @@ usage(void) {
 	perr("    -o (n|y|[y,]<fg>,<bg>)");
 	perr("                     use colors *");
 	perr("    -p               be pedantic about buggy applications");
+	perr("    -P <fn>          write printer output to file <fn>");
 	perr("    -r               reverse backspace and delete keys *");
 	perr("    -s               use full screen mode console");
 	perr("    -t (<n>|@)       delay before exiting full screen mode *");
@@ -585,7 +586,7 @@ get_config(int argc, char **argv) {
 	unsigned long ul;
 	opterr = 0;
 	while ((opt = getopt(argc, argv,
-	    "abc:d:e:f:l:m:no:prst:v:wy:z:")) != EOF) {
+	    "abc:d:e:f:l:m:no:pP:rst:v:wy:z:")) != EOF) {
 		switch (opt) {
 		case 'a':
 			/*
@@ -856,6 +857,21 @@ get_config(int argc, char **argv) {
 				 * so it is parsed in a separate function
 				 */
 				if (parse_color()) rc = (-1);
+			}
+			break;
+		case 'P':
+			/*
+			 * printer file; overrides the printer file
+			 * defined in the configuration file
+			 */
+			if (conf_printer) {
+				only_once('P');
+				rc = (-1);
+			} else if (! *optarg) {
+				perr("printer file name may not be empty");
+				rc = (-1);
+			} else {
+				conf_printer = optarg;
 			}
 			break;
 		case 'm':

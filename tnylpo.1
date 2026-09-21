@@ -63,6 +63,8 @@ tnylpo \- a utility to run programs written for CP/M-80
 .RB [ -o ( n | y |[ y, ]
 .IB <fg> , <bg>
 )]
+.RB [ -P
+.IR <file> ]
 .RB [ -t
 .RI ( <n>
 |
@@ -631,6 +633,12 @@ they have no corresponding command line options and are explained below
 .RB ( text
 |
 .BR raw )
+.br
+command line option
+.B -P
+.I <path>
+.RB ( "printer file"
+only)
 .RS
 .PP
 define the path and the format of the data files representing the
@@ -639,7 +647,8 @@ CP/M character I/O devices
 .BR PUN: ,
 and
 .BR RDR: ;
-there are no corresponding command line options. Details are explained
+only the printer file can also be specified on the command line. Details
+are explained
 below (see
 .BR "Character devices" ).
 .RE
