@@ -456,9 +456,13 @@ parse_save(void) {
 	 * if no range has been specified, the whole TPA will be saved;
 	 * unfortunately, since the -m/memory size option has been
 	 * introduced, we cannot be sure about the end address of the
-	 * TPA yet, so we leave it at (-1)
+	 * TPA yet, so we set it to (-1), which causes the memory save
+	 * routine to use the highest address of the TPA in its place
 	 */
-	if (! range_set) conf_save_start = 0x100;
+	if (! range_set) {
+		conf_save_start = 0x100;
+		conf_save_end = (-1);
+	}
 	/*
 	 * a file name must be specified and it may not be empty
 	 */
