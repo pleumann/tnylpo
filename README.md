@@ -192,15 +192,15 @@ running `sh build.sh`.
 sufficiently compatible with `ncurses`); they are included in the `base` resp.
 `comp` binary sets of the core NetBSD system.
 
-*OpenBSD*: `ncurses` and the C compiler are provided by the `base*XX*.tgz` resp.
-the `comp*XX*.tgz` distribution sets of the core OpenBSD system.
+*OpenBSD*: `ncurses` and the C compiler are provided by the `baseNN.tgz` resp.
+the `compNN.tgz` distribution sets of the core OpenBSD system.
 
 *AIX*: Depending on the available C compilers and the location of `ncurses`
 in the file system, you will have to adapt the variables `CC`, `NCURSESROOT`,
 `CFLAGS`, and `LIBS` in the AIX specific portion of `build.sh`.
 As provided, `build.sh` will work for 32 bit AIX 5.3
 (reflecting the limitations of my RS/6000 7043 Model 150 development system)
-with the freeware packages `ncurses`, `ncurses-devel`, `make`, and `gcc`
+with the freeware packages `ncurses`, `ncurses-devel`, and `gcc`
 (and their numerous dependencies) from
 [oss4aix.org](http://oss4aix.org/download/compatible/aix53/).
 
