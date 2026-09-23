@@ -140,20 +140,30 @@ Notes:
 2. needs to be run with the `-n` (don't close files) option.
 3. as I said, go play with your smartphone, kiddy!
 ## How do I build it?
-Make sure you have a version of the `ncurses` library supporting
-wide characters and its headers installed
-(I used version 5.9 during development). You'll need a C compiler
-supporting the C99
-standard. The `makefile` contains GNU `make` features, so you'll
-need GNU `make` to use it (but then it is trivial and short enough that you
-can easily modify it to suit your favourite `make` utility).
+**Warning! Substantial changes from previous releases!**
 
-Building under Linux, Mac OS X, and Free/Open/NetBSD is as easy as entering
+Make sure you have a version of the `ncurses` library supporting
+wide characters and its headers installed (I used version 5.9 during
+development, but you may get away with an earlier version). The source
+code uses some elements from the C99 standard, so ideally, your C compiler
+should support C99 (but building is possible with GCC 3.x or Sun's
+Forte 7 Developer compiler, which both offer only partial C99 support).
+
+Building under Linux, Mac OS X, and Free/Open/NetBSD is as easy as running
 ```sh
-make
+sh build.sh
 ```
-(resp. `gmake` on platforms with a non-GNU primary `make` utility). Under
-AIX and Solaris, you will have to edit `makefile` first, see the notes below.
+in the base directory of the `tnylpo` source code.
+
+`build.sh` is a Bourne shell wrapper script which determines platform specific
+compiler options and library paths; these are passed to `make` which
+does the actual building using the dependency information in `makefile.mk`.
+This approach allows the use of virtually any variant of the `make` utility
+(in earlier releases, the provided `makefile` used GNU Make extensions).
+
+Under AIX and Solaris (which are less standardized in respect to available
+compilers and libraries), you will have to adapt `build.sh` to your system
+before executing it (see the notes below).
 ### Platform-specific notes:
 *Mac OS X*: The Xcode Command Line Tools (which can be installed with the
 command `xcode-select --install`) are sufficient to compile `tnylpo`,
@@ -166,29 +176,29 @@ on the full screen console under Mac OS X 15 (the line orientated console
 is not affected). Finally, I was able to reproduce this reported issue after
 updating my M1 MacBook Pro from Mac OS X 13 (Ventura) to Mac OS X 15, but the
 exact mechanics of this bug still elude me. Fortunately, the problem is easily
-fixed by recompiling `tnylpo` (`make veryclean ; make`) under Mac OS X 15
+fixed by recompiling `tnylpo` (`sh build.sh veryclean ; sh build.sh`) under
+Mac OS X 15
 (after an OS update, be sure to update the Xcode Command Line Tools as well).
  
-*Linux*: On most distributions, the packages `build-essential` and
-`libncurses-dev` (and optionally, `git`) resp. their dependencies provide
+*Linux*: On most (Debian derived) distributions, the packages `build-essential`
+and `libncurses-dev` resp. their dependencies provide
 everything needed for building `tynlpo`.
 
-*FreeBSD*: Installing the binary packages `ncurses` and `gmake` (and
-optionally, `git`) with `pkg install` will enable you to use the provided
-`makefile` to build `tnylpo`.
+*FreeBSD*: The C compiler is part of the `FreeBSD-devel` subpackage of the
+base system. Install the binary package `ncurses` with `pkg install` before
+running `sh build.sh`.
 
-*NetBSD*: `gmake` (and `git`) are available as binary packages, and
-can be installed with the command `pkgin install`. The provided `makefile`
-uses the native C compiler and `curses` library, which is sufficiently
-compatible with `ncurses`.
+*NetBSD*: `build.sh` uses the native C compiler and `curses` library (which is
+sufficiently compatible with `ncurses`); both are included in the `comp` binary
+set of the core NetBSD system..
 
-*OpenBSD*: `ncurses` and the C compiler are part of the core OpenBSD system,
-and `gmake` (and `git`) can be installed as binary packages with `pkg_add`.
+*OpenBSD*: `ncurses` and the C compiler are part of the `compXX.tgz`
+distribution set of the core OpenBSD system.
 
 *AIX*: Depending on the available C compilers and the location of `ncurses`
-in the file system, you will have to adapt the AIX
-specific portion of `makefile`, especially  the variables `CC`, `NCURSESROOT`
-`CFLAGS`, and `LIBS`. As provided, `makefile` will work for 32 bit AIX 5.3
+in the file system, you will have to adapt the variables `CC`, `NCURSESROOT`
+`CFLAGS`, and `LIBS` in the AIX specific portion of `build.sh`.
+As provided, `build.sh` will work for 32 bit AIX 5.3
 (reflecting the limitations of my RS/6000 7043 Model 150 development system)
 with the freeware packages `ncurses`, `ncurses-devel`, `make`, and `gcc`
 (and their numerous dependencies) from
@@ -196,7 +206,7 @@ with the freeware packages `ncurses`, `ncurses-devel`, `make`, and `gcc`
 
 *Solaris*: Depending on your Solaris version, your hardware, your compiler,
 and the place where `ncurses` lives on your system, you will have to adapt the
-Solaris portion in `makefile`. Unmodified, it will attempt to build
+Solaris portion in `build.sh`. Unmodified, it will attempt to build
 `tnylpo` for a UltraSparc IIe running Solaris 9 using the Forte 7 Developer
 compiler and the `ncurses` package from the
 [OpenCSW project](https://www.opencsw.org). As a guideline, two alternative
