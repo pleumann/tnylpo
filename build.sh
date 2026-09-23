@@ -110,9 +110,9 @@ SunOS)
 	CFLAGS="-xc99=%all -fast -xarch=v9a -xchip=ultra2e -DOLD_SOLARIS"
 	CFLAGS="$CFLAGS -D_XOPEN_SOURCE_EXTENDED -D__EXTENSIONS__"
 	CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
-	CFLAGS="$CFLAGS -I $(NCURSESROOT)/include/ncursesw"
-	CFLAGS="$CFLAGS -I $(NCURSESROOT)/include"
-	LIBS="-L $(NCURSESROOT)/lib/64 -R $(NCURSESROOT)/lib/64 -lncursesw -lrt"
+	CFLAGS="$CFLAGS -I $NCURSESROOT/include/ncursesw"
+	CFLAGS="$CFLAGS -I $NCURSESROOT/include"
+	LIBS="-L $NCURSESROOT/lib/64 -R $NCURSESROOT/lib/64 -lncursesw -lrt"
 	#
 	# - SparcClassic (i.e., microSPARC, 32 bit)
 	# - Solaris 9
@@ -125,9 +125,9 @@ SunOS)
 	#CFLAGS="-xc99=%all -fast -xtarget=sslc -DOLD_SOLARIS"
 	#CFLAGS="$CFLAGS -D_XOPEN_SOURCE_EXTENDED -D__EXTENSIONS__"
 	#CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
-	#CFLAGS="$CFLAGS -I $(NCURSESROOT)/include/ncursesw"
-	#CFLAGS="$CFLAGS -I $(NCURSESROOT)/include"
-	#LIBS="-L $(NCURSESROOT)/lib -R $(NCURSESROOT)/lib -lncursesw -lrt"
+	#CFLAGS="$CFLAGS -I $NCURSESROOT/include/ncursesw"
+	#CFLAGS="$CFLAGS -I $NCURSESROOT/include"
+	#LIBS="-L $NCURSESROOT/lib -R $NCURSESROOT/lib -lncursesw -lrt"
 	#
 	# - Pentium MMX (i.e., 32 bit)
 	# - Solaris 9
@@ -139,9 +139,9 @@ SunOS)
 	#CFLAGS="-std=gnu99 -pedantic -Wall -O3 -DOLD_SOLARIS"
 	#CFLAGS="$CFLAGS -D_XOPEN_SOURCE_EXTENDED -D__EXTENSIONS__"
 	#CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
-	#CFLAGS="$CFLAGS -I $(NCURSESROOT)/include/ncursesw"
-	#CFLAGS="$CFLAGS -I $(NCURSESROOT)/include"
-	#LIBS="-L $(NCURSESROOT)/lib -R $(NCURSESROOT)/lib -lncursesw -lrt"
+	#CFLAGS="$CFLAGS -I $NCURSESROOT/include/ncursesw"
+	#CFLAGS="$CFLAGS -I $NCURSESROOT/include"
+	#LIBS="-L $NCURSESROOT/lib -R $NCURSESROOT/lib -lncursesw -lrt"
 	;;
 AIX)
 	#
@@ -155,8 +155,8 @@ AIX)
 	CC="gcc"
 	NCURSESROOT="/opt/freeware"
 	CFLAGS="-std=gnu99 -pedantic -Wall -O3"
-	CFLAGS="$CFLAGS -D_LARGE_FILES -I$(NCURSESROOT)/include/ncursesw"
-	LIBS="-L$(NCURSESROOT)/lib -lncursesw"
+	CFLAGS="$CFLAGS -D_LARGE_FILES -I$NCURSESROOT/include/ncursesw"
+	LIBS="-L$NCURSESROOT/lib -lncursesw"
 	;;
 *)
 	echo "unsupported OS platform \"$OS\", you need to adapt $0" 1>&2
