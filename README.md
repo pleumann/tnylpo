@@ -170,7 +170,7 @@ command `xcode-select --install`) are sufficient to compile `tnylpo`,
 and the `ncurses` library is available by default.
 
 There seems to be a `ncurses` incompatibility between Mac OS X 15 (Sequoia)
-and preceeding OS versions: In certain circumstances, `tnylpo` executables
+and preceeding OS versions: Under certain circumstances, `tnylpo` executables
 compiled on an earlier OS version display all printable characters as `^@`
 on the full screen console under Mac OS X 15 (the line orientated console
 is not affected). Finally, I was able to reproduce this reported issue after
@@ -189,14 +189,14 @@ base system. Install the binary package `ncurses` with `pkg install` before
 running `sh build.sh`.
 
 *NetBSD*: `build.sh` uses the native C compiler and `curses` library (which is
-sufficiently compatible with `ncurses`); both are included in the `comp` binary
-set of the core NetBSD system..
+sufficiently compatible with `ncurses`); they are included in the `base` resp.
+`comp` binary sets of the core NetBSD system.
 
-*OpenBSD*: `ncurses` and the C compiler are part of the `compXX.tgz`
-distribution set of the core OpenBSD system.
+*OpenBSD*: `ncurses` and the C compiler are provided by the `base*XX*.tgz` resp.
+the `comp*XX*.tgz` distribution sets of the core OpenBSD system.
 
 *AIX*: Depending on the available C compilers and the location of `ncurses`
-in the file system, you will have to adapt the variables `CC`, `NCURSESROOT`
+in the file system, you will have to adapt the variables `CC`, `NCURSESROOT`,
 `CFLAGS`, and `LIBS` in the AIX specific portion of `build.sh`.
 As provided, `build.sh` will work for 32 bit AIX 5.3
 (reflecting the limitations of my RS/6000 7043 Model 150 development system)

@@ -149,7 +149,7 @@ AIX)
 	#
 	# - RS/6000 7043 Model 150 (i.e., PowerPC 604e, 32 bit)
 	# - AIX 5.3
-	# - gcc 4.8.4 www.oss4aix.org
+	# - gcc 4.8.4 from www.oss4aix.org
 	# - ncurses from www.oss4aix.org
 	#
 	CC="gcc"
