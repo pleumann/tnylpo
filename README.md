@@ -11,7 +11,7 @@ under
   * Rocky Linux 9.1
   * Slackware 14.2 i386
   * Alpine Linux 3.22.2 i386, amd64,
-* FreeBSD (12.0 amd64; 13.0 i386; 14.2 amd64),
+* FreeBSD (12.0 amd64; 13.0 i386; 14.2 amd64; 15.1 amd64),
 * NetBSD (8.0 i386, sparc, vax; 9.2 amd64, sparc64, i386; 10.0 i386, sparc;
 10.1 amd64, 11.0 i386),
 * OpenBSD (6.4, 6.7, 6.9, 7.6, 7.9 i386),
