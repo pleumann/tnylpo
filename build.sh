@@ -134,7 +134,7 @@ SunOS)
 	# - gcc 3.4.6 from www.opencsw.org
 	# - ncurses from www.opencsw.org
 	#
-	#CC="/opt/csw/bin/gcc"
+	#CC="/opt/csw/gcc3/bin/gcc"
 	#NCURSESROOT="/opt/csw"
 	#CFLAGS="-std=gnu99 -pedantic -Wall -O3 -DOLD_SOLARIS"
 	#CFLAGS="$CFLAGS -D_XOPEN_SOURCE_EXTENDED -D__EXTENSIONS__"
@@ -152,7 +152,7 @@ AIX)
 	# - gcc 4.8.4 from www.oss4aix.org
 	# - ncurses from www.oss4aix.org
 	#
-	CC="gcc"
+	CC="/opt/freeware/bin/gcc"
 	NCURSESROOT="/opt/freeware"
 	CFLAGS="-std=gnu99 -pedantic -Wall -O3"
 	CFLAGS="$CFLAGS -D_LARGE_FILES -I$NCURSESROOT/include/ncursesw"
