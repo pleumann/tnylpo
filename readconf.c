@@ -1266,13 +1266,18 @@ parse_config(void) {
 			}
 			break;
 		}
-		l = wcslen(line) - 1;
-		if (line[l] != L'\n') {
+		l = wcslen(line);
+		if (l && line[l - 1] == L'\n') {
+			line[--l] = L'\0';
+		} else if (! feof(cf)) {
 			perr("%s(%d): line too long", cfn, ln);
 			rc = (-1);
 			goto premature_exit;
 		}
-		line[l] = L'\0';
+		/*
+		 * tolerate DOS/Windows line endings
+		 */
+		if (l && line[l - 1] == L'\r') line[--l] = L'\0';
 		curr_p = line;
 		/*
 		 * get first token; skip empty lines and lines containing
