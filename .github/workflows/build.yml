@@ -106,7 +106,10 @@ jobs:
           NOTES: |
             Binaries of tnylpo built from the fork at https://gitlab.com/pleumann/tnylpo.
 
-            - **Linux**: built on Ubuntu 22.04, requires glibc 2.35 or newer and ncurses 6.
+            - **Linux**: `tnylpo-linux-x86_64.zip` for PCs (x86_64),
+              `tnylpo-linux-arm64.zip` for 64-bit ARM systems (e.g. Raspberry Pi 3/4/5
+              with a 64-bit OS). Built on Ubuntu 22.04; any distribution with
+              glibc 2.35 or newer and ncurses 6 will do.
             - **Mac OS X**: universal binary (arm64 and x86_64), Mac OS X 11 or newer.
               After downloading with a browser, remove the quarantine flag
               from the unpacked files: `xattr -dr com.apple.quarantine <directory>`
