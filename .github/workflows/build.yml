@@ -1,0 +1,120 @@
+#
+# Builds tnylpo with dist.sh for Linux (x86_64, arm64), macOS (universal
+# binary for arm64 and x86_64) and Windows (Cygwin). Every push produces
+# downloadable workflow artifacts; pushing a tag <upstream version>-bin
+# (e.g. 1.2.2-bin, or 1.2.2-bin.2 for a second build of the same version)
+# additionally publishes a GitHub release containing all archives.
+#
+# The repository on GitHub is a push mirror of the GitLab fork, so tags
+# and branches are pushed to GitLab, never directly to GitHub.
+#
+name: build
+
+on:
+  push:
+    branches: ['**']
+    tags: ['*-bin*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # built on 22.04 so the binaries also run on distributions
+          # with an older glibc (>= 2.35)
+          - name: linux-x86_64
+            os: ubuntu-22.04
+          - name: linux-arm64
+            os: ubuntu-22.04-arm
+          - name: macos-universal
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ncurses
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libncurses-dev zip
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: sh dist.sh tnylpo-${{ matrix.name }}
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '11.0'
+          CPPFLAGS: -arch arm64 -arch x86_64
+          LDFLAGS: -arch arm64 -arch x86_64
+        run: |
+          sh dist.sh tnylpo-${{ matrix.name }}
+          lipo -info tnylpo tnylpo-convert
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tnylpo-${{ matrix.name }}
+          path: tnylpo-${{ matrix.name }}.zip
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: C:\cygwin\bin\bash.exe --noprofile --norc -eo pipefail -o igncr '{0}'
+    steps:
+      # keep LF line endings, make and the sources must not see CRs
+      - name: Disable CRLF conversion
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: cygwin/cygwin-install-action@v4
+        with:
+          packages: make gcc-core libncurses-devel ncurses zip
+
+      - name: Build
+        run: sh dist.sh tnylpo-windows-x86_64
+
+      - name: List archive
+        run: zip -sf tnylpo-windows-x86_64.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tnylpo-windows-x86_64
+          path: tnylpo-windows-x86_64.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [unix, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: |
+            Binaries of tnylpo built from the fork at https://gitlab.com/pleumann/tnylpo.
+
+            - **Linux**: built on Ubuntu 22.04, requires glibc 2.35 or newer and ncurses 6.
+            - **Mac OS X**: universal binary (arm64 and x86_64), Mac OS X 11 or newer.
+              After downloading with a browser, remove the quarantine flag
+              from the unpacked files: `xattr -dr com.apple.quarantine <directory>`
+            - **Windows**: runs without a Cygwin installation; the required
+              Cygwin DLLs and a minimal terminfo database are included.
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "tnylpo $GITHUB_REF_NAME" \
+            --notes "$NOTES" \
+            --generate-notes

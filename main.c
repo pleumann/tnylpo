@@ -50,10 +50,11 @@
 #include <windows.h>
 
 /*
- * set TERMINFO to our local datatabase
+ * set TERMINFO to our local datatabase, unless the user has set it
  */
 static void
 set_terminfo_relative(void) {
+    if (getenv("TERMINFO")) return;
     char exe[MAX_PATH];
     GetModuleFileNameA(NULL, exe, sizeof(exe));
     char *slash = strrchr(exe, '\\'); if (slash) *slash = '\0';

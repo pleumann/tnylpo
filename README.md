@@ -171,8 +171,8 @@ running `sh dist.sh` in a Cygwin shell.
 
 ### Platform-specific notes:
 *Windows*: You will need Cygwin to build `tnylpo`. From the graphical Cygwin
-installer select and install `gcc-core`, `make`, `binutils`, `git`, `ncurses`
-and `ncurses-dev`.
+installer select and install `gcc-core`, `make`, `binutils`, `git`, `ncurses`,
+`libncurses-devel` and (for `dist.sh`) `zip`.
 
 `build.sh` does not support Cygwin; run `sh dist.sh` instead. Besides
 the executables (which work within the current environment), it creates a
